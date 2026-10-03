@@ -1,0 +1,1010 @@
+
+    <!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.A0">
+    <title>01_XVIP // CODDYCAMP FRONTEND DEVELOPER PORTFOLIO</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.A.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?A=Fira+Code:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#020408',
+                            dark: '#080d1a',
+                            card: '#0f172a',
+                            green: '#00ff66',
+                            cyan: '#00f3ff',
+                            red: '#ff0055',
+                            yellow: '#ffbe0b',
+                            purple: '#b5179e',
+                            border: 'rgba(0, 243, 255, 0.25)'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Cyber Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020408;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff66;
+        }
+
+        /* Scanline HUD Overlay Effect */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.4) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(0, 255, 102, 0.03),
+                rgba(0, 243, 255, 0.02),
+                rgba(255, 0, 85, 0.03)
+            );
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Glow utilities */
+        .glow-cyan {
+            box-shadow: 0 0 18px rgba(0, 243, 255, 0.35), inset 0 0 15px rgba(0, 243, 255, 0.08);
+        }
+        .glow-green {
+            box-shadow: 0 0 18px rgba(0, 255, 102, 0.35), inset 0 0 15px rgba(0, 255, 102, 0.08);
+        }
+        .glow-red {
+            box-shadow: 0 0 18px rgba(255, 0, 85, 0.4), inset 0 0 15px rgba(255, 0, 85, 0.08);
+        }
+        .glow-text-cyan {
+            text-shadow: 0 0 12px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+        .glow-text-green {
+            text-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 0 20px rgba(0, 255, 102, 0.4);
+        }
+
+        /* Cyberpunk Clip Corners */
+        .cyber-corner {
+            clip-path: polygon(
+                0 0, 
+                calc(100% - 16px) 0, 
+                100% 16px, 
+                100% 100%, 
+                16px 100%, 
+                0 calc(100% - 16px)
+            );
+        }
+        .cyber-button {
+            clip-path: polygon(
+                12px 0, 
+                100% 0, 
+                100% calc(100% - 12px), 
+                calc(100% - 12px) 100%, 
+                0 100%, 
+                0 12px
+            );
+        }
+
+        /* Glitch Keyframes */
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 2px); }
+            40% { transform: translate(-3px, -2px); }
+            60% { transform: translate(3px, 1px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        .glitch-hover:hover {
+            animation: glitch-anim 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        /* Matrix HUD Pulse */
+        @keyframes border-pulse {
+            0%, 100% { border-color: rgba(0, 243, 255, 0.7); }
+            50% { border-color: rgba(0, 255, 102, 0.8); }
+        }
+        .hud-border-pulse {
+            animation: border-pulse 4s infinite;
+        }
+    </style>
+</head>
+<body class="bg-cyber-black text-slate-100 font-rajdhani min-h-screen overflow-x-hidden selection:bg-cyber-cyan selection:text-black">
+
+    <!-- Hacker Matrix Canvas Rain Background -->
+    <canvas id="matrixCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+    
+    <!-- CRT Overlay Scanlines -->
+    <div class="scanlines fixed inset-0 z-50 opacity-30"></div>
+
+    <!-- MAIN INTERACTIVE WRAPPER -->
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+        <header class="border-b border-cyber-border bg-cyber-dark/80 backdrop-blur-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                
+                <!-- Brand Logo & Coddycamp Tag -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                    <div class="w-11 h-11 bg-cyber-dark border-2 border-cyber-cyan flex items-center justify-center font-orbitron font-black text-xl text-cyber-cyan glow-cyan cyber-button">
+                        <span class="text-cyber-green">01</span>
+                    </div>
+                    <div>
+                        <div class="font-orbitron font-extrabold text-xl tracking-wider flex items-center gap-1">
+                            <span class="text-cyber-cyan glow-text-cyan">01_XVIP</span>
+                            <span class="text-cyber-green">// PORTFOLIO</span>
+                        </div>
+                        <div class="font-mono text-[11px] text-slate-400 tracking-widest flex items-center gap-2">
+                            <span class="inline-block w-2 h-2 rounded-full bg-cyber-green animate-ping"></span>
+                            CODDYCAMP STUDENT // DEV MATRIX
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-3 font-mono text-xs uppercase">
+                    <button id="nav-home" onclick="switchTab('home')" class="nav-btn active px-4 py-2 rounded border border-cyber-cyan bg-cyber-cyan/15 text-cyber-cyan glow-cyan transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-house-laptop text-xs"></i> [01] HUB
+                    </button>
+                    <button id="nav-skills" onclick="switchTab('skills')" class="nav-btn px-4 py-2 rounded border border-transparent hover:border-cyber-cyan/40 text-slate-300 hover:text-cyber-cyan transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-xs"></i> [02] SKILLS & CLI
+                    </button>
+                    <button id="nav-projects" onclick="switchTab('projects')" class="nav-btn px-4 py-2 rounded border border-transparent hover:border-cyber-cyan/40 text-slate-300 hover:text-cyber-cyan transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-code-branch text-xs"></i> [03] PROJECTS & CONTACT
+                    </button>
+                </nav>
+
+                <!-- Audio Switch & Quick Settings -->
+                <div class="flex items-center space-x-3">
+                    <button id="audioToggle" onclick="toggleAudio()" class="px-3 py-1.5 font-mono text-xs border border-cyber-cyan/50 bg-cyber-card hover:bg-cyber-cyan/20 text-cyber-cyan rounded flex items-center gap-2 transition-all">
+                        <i id="audioIcon" class="fa-solid fa-volume-high text-cyber-green"></i>
+                        <span id="audioText" class="hidden sm:inline">SYNTH: ON</span>
+                    </button>
+
+                    <!-- Mobile Navigation Drawer Toggle -->
+                    <button onclick="toggleMobileNav()" class="md:hidden p-2 text-cyber-cyan focus:outline-none border border-cyber-border rounded">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Drawer Menu -->
+            <div id="mobileNav" class="hidden md:hidden border-t border-cyber-border bg-cyber-dark/95 px-4 py-3 space-y-2 font-mono text-xs">
+                <button onclick="switchTab('home'); toggleMobileNav();" class="w-full text-left px-3 py-2 text-cyber-cyan border-l-2 border-cyber-cyan bg-cyber-cyan/10">
+                    [01] HOME HUB
+                </button>
+                <button onclick="switchTab('skills'); toggleMobileNav();" class="w-full text-left px-3 py-2 text-slate-300 hover:text-cyber-cyan">
+                    [02] SKILLS & TERMINAL
+                </button>
+                <button onclick="switchTab('projects'); toggleMobileNav();" class="w-full text-left px-3 py-2 text-slate-300 hover:text-cyber-cyan">
+                    [03] PROJECTS & CONTACT
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <!-- PAGE 1: HOME HUB -->
+            <section id="page-home" class="spa-page space-y-10">
+                
+                <!-- Hero Hacker Statement Banner -->
+                <div class="relative bg-cyber-card border border-cyber-border p-6 sm:p-12 cyber-corner overflow-hidden glow-cyan">
+                    <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-cyber-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div class="relative z-10 space-y-6 max-w-4xl">
+                        <!-- Status Badge -->
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-cyber-green/10 border border-cyber-green/50 text-cyber-green font-mono text-xs rounded-full uppercase tracking-widest">
+                            <i class="fa-solid fa-graduation-cap"></i> CODDYCAMP ACADEMY STUDENT // FRONTEND MATRIX
+                        </div>
+
+                        <!-- PROMINENT HUGE TITLE -->
+                        <div class="space-y-2">
+                            <h1 class="font-orbitron text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white uppercase leading-none glitch-hover">
+                                <span class="text-cyber-cyan glow-text-cyan">HI, I'M</span> <br>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-cyber-green to-white">
+                                    01_XVIP
+                                </span>
+                            </h1>
+                            <p class="font-mono text-base sm:text-xl text-cyber-green font-semibold tracking-wide">
+                                &gt; FRONTEND DEVELOPER & UI CREATOR AT CODDYCAMP
+                            </p>
+                        </div>
+
+                        <p class="text-slate-300 text-base sm:text-lg font-rajdhani font-medium leading-relaxed max-w-2xl">
+                            Passionate modern web developer constructing high-performance, aesthetically dominant interfaces. Master of HTML5, CSS3, AtomJS, VS Code, and Canva design architecture.
+                        </p>
+                        
+                        <!-- CTA Action Buttons -->
+                        <div class="flex flex-wrap gap-4 pt-2 font-mono text-xs">
+                            <button onclick="switchTab('skills')" class="px-6 py-3.5 bg-cyber-cyan text-black font-orbitron font-extrabold uppercase tracking-wider rounded cyber-button hover:bg-white transition flex items-center gap-2 shadow-lg shadow-cyber-cyan/20">
+                                <i class="fa-solid fa-layer-group"></i> EXPLORE SKILLS
+                            </button>
+                            <button onclick="switchTab('skills'); focusTerminal();" class="px-6 py-3.5 bg-cyber-dark border border-cyber-green text-cyber-green hover:bg-cyber-green hover:text-black font-orbitron font-extrabold uppercase tracking-wider rounded cyber-button transition flex items-center gap-2">
+                                <i class="fa-solid fa-terminal"></i> LAUNCH TERMINAL
+                            </button>
+                            <button onclick="downloadCvSim()" class="px-6 py-3.5 bg-cyber-dark border border-cyber-border text-slate-300 hover:border-cyber-cyan hover:text-cyber-cyan font-orbitron font-extrabold uppercase tracking-wider rounded cyber-button transition flex items-center gap-2">
+                                <i class="fa-solid fa-file-arrow-down"></i> DOWNLOAD CV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live System Telemetry & Matrix Rain Control Panel -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    
+                    <!-- System Diagnostics Widget -->
+                    <div class="md:col-span-6 bg-cyber-card border border-cyber-border p-5 rounded-lg cyber-corner space-y-4">
+                        <div class="flex items-center justify-between border-b border-cyber-border pb-3">
+                            <span class="font-orbitron font-bold text-sm text-white uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-microchip text-cyber-cyan"></i> SYSTEM DIAGNOSTICS & TELEMETRY
+                            </span>
+                            <span class="font-mono text-xs text-cyber-green border border-cyber-green/40 px-2 py-0.5 rounded">
+                                ACTIVE
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 font-mono text-xs">
+                            <div class="bg-cyber-dark/80 p-3 rounded border border-cyber-border/40">
+                                <div class="text-slate-400">DEV ACADEMY</div>
+                                <div class="text-sm font-bold text-cyber-cyan font-orbitron mt-0.5">CODDYCAMP</div>
+                            </div>
+                            <div class="bg-cyber-dark/80 p-3 rounded border border-cyber-border/40">
+                                <div class="text-slate-400">LOCAL CLOCK</div>
+                                <div id="liveClock" class="text-sm font-bold text-cyber-green font-orbitron mt-0.5">00:00:00 UTC</div>
+                            </div>
+                            <div class="bg-cyber-dark/80 p-3 rounded border border-cyber-border/40">
+                                <div class="text-slate-400">LOCATION</div>
+                                <div class="text-sm font-bold text-cyber-yellow font-orbitron mt-0.5">UZBEKISTAN</div>
+                            </div>
+                            <div class="bg-cyber-dark/80 p-3 rounded border border-cyber-border/40">
+                                <div class="text-slate-400">FRAME RATE</div>
+                                <div id="fpsCounter" class="text-sm font-bold text-cyber-red font-orbitron mt-0.5">60 FPS</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matrix Rain Customization Controller -->
+                    <div class="md:col-span-6 bg-cyber-card border border-cyber-border p-5 rounded-lg cyber-corner space-y-4">
+                        <div class="flex items-center justify-between border-b border-cyber-border pb-3">
+                            <span class="font-orbitron font-bold text-sm text-white uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-cyber-green"></i> MATRIX RAIN ENGINE CONTROLLER
+                            </span>
+                            <span class="font-mono text-xs text-cyber-cyan">
+                                CANVAS HACKER BG
+                            </span>
+                        </div>
+
+                        <div class="space-y-3 font-mono text-xs">
+                            <!-- Palette buttons -->
+                            <div>
+                                <label class="text-slate-400 block mb-1.5">RAIN PALETTE MATRIX:</label>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button onclick="setMatrixPalette('green')" class="py-1.5 bg-cyber-dark border border-cyber-green text-cyber-green rounded hover:bg-cyber-green/20">GREEN</button>
+                                    <button onclick="setMatrixPalette('cyan')" class="py-1.5 bg-cyber-dark border border-cyber-cyan text-cyber-cyan rounded hover:bg-cyber-cyan/20">CYAN</button>
+                                    <button onclick="setMatrixPalette('red')" class="py-1.5 bg-cyber-dark border border-cyber-red text-cyber-red rounded hover:bg-cyber-red/20">RED</button>
+                                    <button onclick="setMatrixPalette('purple')" class="py-1.5 bg-cyber-dark border border-cyber-purple text-cyber-purple rounded hover:bg-cyber-purple/20">PURPLE</button>
+                                </div>
+                            </div>
+
+                            <!-- Speed Slider -->
+                            <div class="flex items-center justify-between gap-4">
+                                <label class="text-slate-400">SPEED:</label>
+                                <input type="range" id="matrixSpeedSlider" min="15" max="80" value="35" oninput="updateMatrixSpeed(this.value)" class="w-2/3 accent-cyber-cyan">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Coddycamp Dev Highlight Strip -->
+                <div class="bg-cyber-card border border-cyber-border p-6 rounded-lg cyber-corner grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+                    <div class="flex items-start space-x-3">
+                        <i class="fa-solid fa-laptop-code text-2xl text-cyber-cyan mt-1"></i>
+                        <div>
+                            <div class="font-orbitron font-bold text-sm text-white uppercase">Coddycamp Student</div>
+                            <p class="text-slate-400 mt-1">Undergoing rigorous frontend development training and practical website production.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <i class="fa-solid fa-code text-2xl text-cyber-green mt-1"></i>
+                        <div>
+                            <div class="font-orbitron font-bold text-sm text-white uppercase">Pure Stack Agility</div>
+                            <p class="text-slate-400 mt-1">Expertise across HTML5 structure, CSS3 responsive grid, AtomJS interactivity, and VS Code workflows.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <i class="fa-solid fa-pen-nib text-2xl text-cyber-yellow mt-1"></i>
+                        <div>
+                            <div class="font-orbitron font-bold text-sm text-white uppercase">Canva Design UI</div>
+                            <p class="text-slate-400 mt-1">Crafting pixel-perfect cyber graphics, mockups, and banner layouts for high-impact web apps.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- PAGE 2: SKILLS & TERMINAL -->
+            <section id="page-skills" class="spa-page hidden space-y-8">
+                
+                <div class="border-b border-cyber-border pb-4 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-orbitron font-black text-2xl sm:text-3xl text-white uppercase tracking-wider">
+                            <span class="text-cyber-cyan">[02] SKILL MATRIX</span> & INTERACTIVE TERMINAL
+                        </h2>
+                        <p class="font-mono text-xs text-slate-400">Core technologies mastered at Coddycamp Academy</p>
+                    </div>
+
+                    <div class="font-mono text-xs bg-cyber-dark border border-cyber-cyan/40 px-3 py-1.5 rounded text-cyber-cyan">
+                        <i class="fa-solid fa-user-graduate"></i> CODDYCAMP VERIFIED SKILLS
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Left: Interactive Skill Cards Grid -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <h3 class="font-orbitron font-bold text-lg text-white uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-cyber-green"></i> PRIMARY STACK PROGRESS
+                        </h3>
+
+                        <div class="space-y-4" id="skillsContainer">
+                            <!-- Skill cards rendered dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Hacker CLI Terminal -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <h3 class="font-orbitron font-bold text-lg text-white uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-cyber-cyan"></i> 01_XVIP CLI v3.0 INTERACTIVE SHELL
+                        </h3>
+
+                        <div class="bg-black/90 border border-cyber-green/60 rounded cyber-corner shadow-2xl shadow-cyber-green/10 flex flex-col h-[460px]">
+                            
+                            <!-- Terminal Header Bar -->
+                            <div class="bg-cyber-dark border-b border-cyber-green/30 px-4 py-2.5 flex items-center justify-between font-mono text-xs">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                    <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                                    <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                                    <span class="text-slate-400 ml-2">XVIP_TERMINAL // SSH_SECURE</span>
+                                </div>
+                                <span class="text-cyber-green font-bold animate-pulse">ONLINE</span>
+                            </div>
+
+                            <!-- Terminal Console Output Window -->
+                            <div id="terminalOutput" class="p-4 font-mono text-xs text-cyber-green flex-grow overflow-y-auto space-y-2 leading-relaxed">
+                                <div>[SYS_INIT]: Initializing 01_XVIP Portfolio Command Interface...</div>
+                                <div>[SYS_OK]: Coddycamp student credentials verified.</div>
+                                <div class="text-slate-400">Type <span class="text-white font-bold">'help'</span> to see available commands or click skills to inspect code.</div>
+                            </div>
+
+                            <!-- Input Bar -->
+                            <form onsubmit="handleTerminalSubmit(event)" class="border-t border-cyber-green/30 p-3 bg-cyber-dark/80 flex items-center gap-2">
+                                <span class="font-mono text-xs text-cyber-green font-bold">01_XVIP@CODDYCAMP:~$</span>
+                                <input id="terminalInput" type="text" autocomplete="off" placeholder="type 'help', 'skills', 'coddycamp', 'matrix cyan'..." class="bg-transparent text-xs font-mono text-white flex-grow focus:outline-none">
+                                <button type="submit" class="text-xs font-mono px-3 py-1 bg-cyber-green/20 text-cyber-green border border-cyber-green/40 hover:bg-cyber-green hover:text-black rounded transition">EXEC</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- PAGE 3: PROJECTS & CONTACT -->
+            <section id="page-projects" class="spa-page hidden space-y-10">
+                
+                <!-- Section Title -->
+                <div class="border-b border-cyber-border pb-4">
+                    <h2 class="font-orbitron font-black text-2xl sm:text-3xl text-white uppercase tracking-wider">
+                        <span class="text-cyber-green">[03] PROJECTS</span> & ENCRYPTED CONTACT
+                    </h2>
+                    <p class="font-mono text-xs text-slate-400">Featured web applications & digital VIP pass authorization</p>
+                </div>
+
+                <!-- Projects Showcase Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Project 1: BMW XVIP Motors -->
+                    <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg cyber-corner space-y-4 hover:border-cyber-cyan transition group">
+                        <div class="h-40 bg-cyber-dark rounded border border-cyber-border/40 overflow-hidden flex items-center justify-center relative">
+                            <i class="fa-solid fa-car-side text-5xl text-cyber-cyan group-hover:scale-110 transition duration-300"></i>
+                            <span class="absolute top-2 right-2 bg-black/80 font-mono text-[10px] text-cyber-cyan px-2 py-0.5 border border-cyber-cyan/40 rounded">HTML/CSS/JS</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg text-white group-hover:text-cyber-cyan transition">BMW XVIP Motors</h3>
+                        <p class="font-mono text-xs text-slate-400">
+                            Hyper sport BMW division web application with real-time Web Audio V8 engine sound synthesizer and interactive configurator.
+                        </p>
+                        <div class="pt-2 flex justify-between items-center border-t border-cyber-border/40 font-mono text-xs">
+                            <span class="text-cyber-green">STATUS: DEPLOYED</span>
+                            <button onclick="openProjectModal('BMW XVIP Motors', 'A full-scale hyper sports BMW showcase featuring synthesized twin-turbo audio, telemetry gauge bars, and interactive garage customization built with HTML5, Tailwind CSS, and Web Audio API.')" class="text-cyber-cyan hover:underline">DETAILS &gt;</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 2: Cyberpunk HUD Dashboard -->
+                    <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg cyber-corner space-y-4 hover:border-cyber-cyan transition group">
+                        <div class="h-40 bg-cyber-dark rounded border border-cyber-border/40 overflow-hidden flex items-center justify-center relative">
+                            <i class="fa-solid fa-chart-line text-5xl text-cyber-green group-hover:scale-110 transition duration-300"></i>
+                            <span class="absolute top-2 right-2 bg-black/80 font-mono text-[10px] text-cyber-green px-2 py-0.5 border border-cyber-green/40 rounded">CANVAS & ATOMJS</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg text-white group-hover:text-cyber-green transition">Cyber Matrix HUD</h3>
+                        <p class="font-mono text-xs text-slate-400">
+                            Interactive hacker telemetry dashboard built with HTML5 Canvas animation loops, custom sliders, and real-time clock sensors.
+                        </p>
+                        <div class="pt-2 flex justify-between items-center border-t border-cyber-border/40 font-mono text-xs">
+                            <span class="text-cyber-green">STATUS: COMPLETED</span>
+                            <button onclick="openProjectModal('Cyber Matrix HUD', 'Dynamic matrix canvas particle generator and telemetry panel developed during Coddycamp frontend practical modules.')" class="text-cyber-cyan hover:underline">DETAILS &gt;</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: Canva UI Design Vault -->
+                    <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg cyber-corner space-y-4 hover:border-cyber-yellow transition group">
+                        <div class="h-40 bg-cyber-dark rounded border border-cyber-border/40 overflow-hidden flex items-center justify-center relative">
+                            <i class="fa-solid fa-palette text-5xl text-cyber-yellow group-hover:scale-110 transition duration-300"></i>
+                            <span class="absolute top-2 right-2 bg-black/80 font-mono text-[10px] text-cyber-yellow px-2 py-0.5 border border-cyber-yellow/40 rounded">CANVA DESIGN</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg text-white group-hover:text-cyber-yellow transition">Canva Cyber UI Vault</h3>
+                        <p class="font-mono text-xs text-slate-400">
+                            Collection of futuristic banners, website mockups, neon typography assets, and UI card templates created on Canva.
+                        </p>
+                        <div class="pt-2 flex justify-between items-center border-t border-cyber-border/40 font-mono text-xs">
+                            <span class="text-cyber-green">STATUS: ACTIVE VAULT</span>
+                            <button onclick="openProjectModal('Canva Cyber UI Vault', 'Comprehensive design portfolio containing high-definition vector graphics, neon glow text styles, and layout wireframes for cyber websites.')" class="text-cyber-cyan hover:underline">DETAILS &gt;</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Contact Form & VIP Pass Generator -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Left: Encrypted Contact Form -->
+                    <div class="lg:col-span-6 bg-cyber-card border border-cyber-border p-6 rounded-lg cyber-corner space-y-5">
+                        <div class="border-b border-cyber-border pb-3">
+                            <h3 class="font-orbitron font-bold text-lg text-white uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-envelope text-cyber-cyan"></i> SEND ENCRYPTED MESSAGE
+                            </h3>
+                            <p class="font-mono text-xs text-slate-400">Direct transmission line to 01_XVIP</p>
+                        </div>
+
+                        <form id="contactForm" onsubmit="sendEncryptedMessage(event)" class="space-y-4 font-mono text-xs">
+                            <div>
+                                <label class="block text-slate-300 mb-1">YOUR NAME / CALLSIGN</label>
+                                <input type="text" required placeholder="e.g. Alex Miller" class="w-full bg-cyber-dark border border-cyber-border/60 p-2.5 rounded text-white focus:border-cyber-cyan focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-300 mb-1">EMAIL ADDRESS</label>
+                                <input type="email" required placeholder="e.g. client@network.com" class="w-full bg-cyber-dark border border-cyber-border/60 p-2.5 rounded text-white focus:border-cyber-cyan focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-300 mb-1">TRANSMISSION MESSAGE</label>
+                                <textarea required rows="4" placeholder="Write your project proposal or inquiry..." class="w-full bg-cyber-dark border border-cyber-border/60 p-2.5 rounded text-white focus:border-cyber-cyan focus:outline-none"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-3 bg-cyber-cyan text-black font-orbitron font-extrabold text-xs uppercase tracking-wider rounded cyber-button transition hover:bg-white flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> TRANSMIT ENCRYPTED MESSAGE
+                            </button>
+                        </form>
+
+                        <div id="contactStatus" class="hidden p-3 bg-cyber-green/10 border border-cyber-green text-cyber-green font-mono text-xs rounded">
+                            <i class="fa-solid fa-circle-check"></i> TRANSMISSION SENT SUCCESSFULLY TO 01_XVIP!
+                        </div>
+                    </div>
+
+                    <!-- Right: Digital VIP Developer Pass Generator -->
+                    <div class="lg:col-span-6 bg-cyber-card border border-cyber-border p-6 rounded-lg cyber-corner space-y-5">
+                        <div class="border-b border-cyber-border pb-3">
+                            <h3 class="font-orbitron font-bold text-lg text-white uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-id-card text-cyber-green"></i> DIGITAL VIP DEVELOPER BADGE
+                            </h3>
+                            <p class="font-mono text-xs text-slate-400">Generate encrypted Coddycamp credentials pass</p>
+                        </div>
+
+                        <!-- VIP Card Output -->
+                        <div class="bg-cyber-dark border-2 border-cyber-cyan p-5 rounded-lg hud-border-pulse relative overflow-hidden space-y-4">
+                            <div class="flex items-center justify-between border-b border-cyber-border/40 pb-3">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-8 h-8 bg-cyber-cyan text-black font-orbitron font-black flex items-center justify-center text-sm rounded">
+                                        01
+                                    </div>
+                                    <div>
+                                        <div class="font-orbitron font-bold text-sm text-white">01_XVIP DEV BADGE</div>
+                                        <div class="font-mono text-[10px] text-cyber-cyan">CODDYCAMP ACADEMY</div>
+                                    </div>
+                                </div>
+                                <span class="font-mono text-[10px] bg-cyber-green/20 text-cyber-green border border-cyber-green/50 px-2 py-0.5 rounded">VERIFIED</span>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3 font-mono text-xs">
+                                <div class="col-span-2 space-y-2">
+                                    <div>
+                                        <span class="text-slate-400 text-[10px] block">DEVELOPER NAME:</span>
+                                        <span class="text-white font-bold font-orbitron">01_XVIP</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-400 text-[10px] block">ACADEMY STATUS:</span>
+                                        <span class="text-cyber-green font-bold">CODDYCAMP STUDENT</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-400 text-[10px] block">CORE TOOLSET:</span>
+                                        <span class="text-cyber-cyan text-[11px]">HTML5, CSS3, AtomJS, VS Code, Canva</span>
+                                    </div>
+                                </div>
+
+                                <!-- QR Canvas Generator -->
+                                <div class="flex flex-col items-center justify-center bg-black/60 p-2 rounded border border-cyber-border/40">
+                                    <canvas id="qrCanvas" class="w-20 h-20 bg-white p-1 rounded"></canvas>
+                                    <span class="font-mono text-[9px] text-slate-400 mt-1">SCAN HUD</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="window.print()" class="w-full py-2.5 bg-cyber-dark border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black font-mono text-xs rounded transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-print"></i> PRINT VIP BADGE CREDENTIALS
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- Interactive Modal Inspector -->
+        <div id="infoModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-cyber-card border-2 border-cyber-cyan max-w-lg w-full p-6 rounded-lg cyber-corner relative space-y-4 shadow-2xl shadow-cyber-cyan/20">
+                <button onclick="closeInfoModal()" class="absolute top-4 right-4 text-slate-400 hover:text-cyber-red font-mono text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="flex items-center space-x-3 border-b border-cyber-border pb-3">
+                    <div class="w-3 h-8 bg-cyber-cyan"></div>
+                    <div>
+                        <h3 id="modalTitle" class="font-orbitron font-black text-xl text-white uppercase">SKILL DETAILED INSPECTOR</h3>
+                        <span id="modalSubtitle" class="font-mono text-xs text-cyber-green">01_XVIP MATRIX</span>
+                    </div>
+                </div>
+
+                <div id="modalBody" class="font-mono text-xs text-slate-300 leading-relaxed space-y-3">
+                    <!-- Modal text populated dynamically -->
+                </div>
+
+                <div class="pt-2 border-t border-cyber-border flex justify-end">
+                    <button onclick="closeInfoModal()" class="px-4 py-2 bg-cyber-cyan text-black font-orbitron font-bold text-xs rounded">
+                        CLOSE INSPECTOR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="border-t border-cyber-border bg-cyber-dark/90 mt-12 py-6">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between font-mono text-xs text-slate-500 gap-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-cyber-cyan font-bold">01_XVIP PORTFOLIO</span>
+                    <span>&copy; 2026 CODDYCAMP FRONTEND DEVELOPER. ALL RIGHTS RESERVED.</span>
+                </div>
+                <div class="flex space-x-4 text-slate-400">
+                    <span class="hover:text-cyber-green cursor-pointer"><i class="fa-solid fa-graduation-cap"></i> CODDYCAMP</span>
+                    <span class="hover:text-cyber-cyan cursor-pointer"><i class="fa-solid fa-laptop-code"></i> VS CODE</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        /* ==========================================
+           1. SKILLS DATABASE & CODDYCAMP DATA
+           ========================================== */
+        const SKILLS_DATA = [
+            {
+                id: 'html',
+                name: 'HTML5 Architect',
+                percent: 95,
+                color: 'cyber-cyan',
+                icon: 'fa-brands fa-html5',
+                desc: 'Semantic web architecture, HTML5 Canvas graphics API, clean structural DOM layouts, and accessible UI hierarchy built at Coddycamp.'
+            },
+            {
+                id: 'css',
+                name: 'CSS3 Cyber Dynamics',
+                percent: 92,
+                color: 'cyber-green',
+                icon: 'fa-brands fa-css3-alt',
+                desc: 'Tailwind CSS, Grid, Flexbox, glassmorphism visual depth, neon glow effects, scanlines, CRT filters, and keyframe animations.'
+            },
+            {
+                id: 'atomjs',
+                name: 'AtomJS Interactivity',
+                percent: 88,
+                color: 'cyber-yellow',
+                icon: 'fa-solid fa-atom',
+                desc: 'Reactive UI scripting, DOM manipulation, state management, event handling, and SPA tab navigation logic.'
+            },
+            {
+                id: 'vscode',
+                name: 'VS Code Environment',
+                percent: 90,
+                color: 'cyber-cyan',
+                icon: 'fa-solid fa-code',
+                desc: 'Mastery over extensions, Emmet shortcuts, rapid debugging, custom snippets, live server workflows, and terminal integrations.'
+            },
+            {
+                id: 'canva',
+                name: 'Canva Design Suite',
+                percent: 85,
+                color: 'cyber-purple',
+                icon: 'fa-solid fa-palette',
+                desc: 'Cyberpunk UI layout mockups, graphic asset design, neon logo vectors, and visually striking presentation banners.'
+            }
+        ];
+
+        /* ==========================================
+           2. WEB AUDIO API SYNTHESIZER
+           ========================================== */
+        let audioCtx = null;
+        let isAudioEnabled = true;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(freq = 800, type = 'sine', duration = 0.08) {
+            if (!isAudioEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + duration);
+
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio play error:", e);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioText');
+
+            if (isAudioEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-cyber-green';
+                text.innerText = 'SYNTH: ON';
+                playSound(900, 'sine', 0.1);
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-cyber-red';
+                text.innerText = 'SYNTH: OFF';
+            }
+        }
+
+        /* ==========================================
+           3. MATRIX RAIN CANVAS BACKGROUND ENGINE
+           ========================================== */
+        let matrixColor = '#00ff66';
+        let matrixInterval = null;
+        let matrixSpeed = 35;
+
+        function initMatrixCanvas() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const chars = '01_XVIP_CODDYCAMP_HTML5_CSS3_ATOMJS_VSCODE_CANVA_0123456789';
+            const fontSize = 14;
+            const columns = Math.floor(canvas.width / fontSize);
+            const drops = Array(columns).fill(1);
+
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(2, 4, 8, 0.08)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = matrixColor;
+                ctx.font = fontSize + 'px "Fira Code", monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            if (matrixInterval) clearInterval(matrixInterval);
+            matrixInterval = setInterval(drawMatrix, matrixSpeed);
+        }
+
+        function setMatrixPalette(colorKey) {
+            playSound(1000, 'sine', 0.05);
+            if (colorKey === 'green') matrixColor = '#00ff66';
+            else if (colorKey === 'cyan') matrixColor = '#00f3ff';
+            else if (colorKey === 'red') matrixColor = '#ff0055';
+            else if (colorKey === 'purple') matrixColor = '#b5179e';
+        }
+
+        function updateMatrixSpeed(val) {
+            matrixSpeed = 95 - val;
+            initMatrixCanvas();
+        }
+
+        /* ==========================================
+           4. SPA TAB SWITCHING LOGIC
+           ========================================== */
+        function switchTab(pageId) {
+            playSound(750, 'sine', 0.05);
+
+            document.querySelectorAll('.spa-page').forEach(page => page.classList.add('hidden'));
+
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2 rounded border border-transparent text-slate-300 hover:border-cyber-cyan/40 hover:text-cyber-cyan transition-all flex items-center gap-2";
+            });
+
+            const activeBtn = document.getElementById(`nav-${pageId}`);
+            if (activeBtn) {
+                activeBtn.className = "nav-btn active px-4 py-2 rounded border border-cyber-cyan bg-cyber-cyan/15 text-cyber-cyan glow-cyan transition-all flex items-center gap-2";
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileNav() {
+            document.getElementById('mobileNav').classList.toggle('hidden');
+        }
+
+        /* ==========================================
+           5. RENDER SKILLS & INTERACTIVE MODAL
+           ========================================== */
+        function renderSkills() {
+            const container = document.getElementById('skillsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            SKILLS_DATA.forEach(skill => {
+                const card = document.createElement('div');
+                card.className = "bg-cyber-card border border-cyber-border p-4 rounded-lg cyber-corner cursor-pointer hover:border-cyber-cyan transition space-y-2";
+                card.onclick = () => openSkillModal(skill);
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="${skill.icon} text-xl text-${skill.color}"></i>
+                            <span class="font-orbitron font-bold text-sm text-white">${skill.name}</span>
+                        </div>
+                        <span class="font-mono text-xs text-${skill.color} font-bold">${skill.percent}%</span>
+                    </div>
+                    <div class="w-full bg-cyber-dark h-2.5 rounded overflow-hidden p-0.5 border border-cyber-border/40">
+                        <div class="bg-${skill.color} h-full rounded transition-all duration-1000" style="width: ${skill.percent}%"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openSkillModal(skill) {
+            playSound(900, 'square', 0.08);
+            document.getElementById('modalTitle').innerText = skill.name;
+            document.getElementById('modalSubtitle').innerText = `CODDYCAMP MASTERY: ${skill.percent}%`;
+            document.getElementById('modalBody').innerHTML = `
+                <p>${skill.desc}</p>
+                <div class="bg-cyber-dark p-3 rounded border border-cyber-border/50 text-cyber-cyan font-mono text-xs">
+                    <code>&lt;!-- Verified Coddycamp Skill Code --&gt;<br>const dev = "01_XVIP";<br>const tool = "${skill.name}";<br>console.log(\`Mastered \${tool} by \${dev}\`);</code>
+                </div>
+            `;
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+
+        function openProjectModal(title, desc) {
+            playSound(900, 'sine', 0.08);
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalSubtitle').innerText = "FEATURED PROJECT ARCHITECTURE";
+            document.getElementById('modalBody').innerHTML = `<p>${desc}</p>`;
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+
+        function closeInfoModal() {
+            playSound(500, 'sine', 0.05);
+            document.getElementById('infoModal').classList.add('hidden');
+        }
+
+        /* ==========================================
+           6. HACKER CLI TERMINAL SUBMIT
+           ========================================== */
+        function handleTerminalSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('terminalInput');
+            const cmd = input.value.trim().toLowerCase();
+            if (!cmd) return;
+
+            playSound(1100, 'square', 0.03);
+
+            const output = document.getElementById('terminalOutput');
+
+            // Add user line
+            const userLine = document.createElement('div');
+            userLine.className = 'text-white font-bold';
+            userLine.innerText = `01_XVIP@CODDYCAMP:~$ ${cmd}`;
+            output.appendChild(userLine);
+
+            const resLine = document.createElement('div');
+            resLine.className = 'text-cyber-cyan my-1';
+
+            if (cmd === 'help') {
+                resLine.innerHTML = `
+                    <div class="text-slate-300">AVAILABLE TERMINAL COMMANDS:</div>
+                    <div>- <span class="text-cyber-green">skills</span>: List primary tech stack</div>
+                    <div>- <span class="text-cyber-green">coddycamp</span>: Display academy status</div>
+                    <div>- <span class="text-cyber-green">matrix [green|cyan|red|purple]</span>: Change rain color</div>
+                    <div>- <span class="text-cyber-green">whoami</span>: Display developer callsign</div>
+                    <div>- <span class="text-cyber-green">clear</span>: Clear terminal console</div>
+                `;
+            } else if (cmd === 'skills') {
+                resLine.innerHTML = `
+                    <div class="text-cyber-yellow">
+                        - HTML5 (95%)<br>
+                        - CSS3 Dynamics (92%)<br>
+                        - AtomJS (88%)<br>
+                        - VS Code (90%)<br>
+                        - Canva UI Suite (85%)
+                    </div>
+                `;
+            } else if (cmd === 'coddycamp') {
+                resLine.innerHTML = `<span class="text-cyber-green">ACADEMY: Coddycamp // ROLE: Student Frontend Developer // STATUS: ACTIVE Matrix</span>`;
+            } else if (cmd === 'whoami') {
+                resLine.innerHTML = `<span class="text-cyber-cyan">CALLSIGN: 01_XVIP // LOCATION: Uzbekistan // SKILLS: HTML, CSS, AtomJS, VS Code, Canva</span>`;
+            } else if (cmd.startsWith('matrix')) {
+                const color = cmd.split(' ')[1];
+                if (['green', 'cyan', 'red', 'purple'].includes(color)) {
+                    setMatrixPalette(color);
+                    resLine.innerHTML = `<span class="text-cyber-green">[SUCCESS]: Rain palette set to ${color.toUpperCase()}</span>`;
+                } else {
+                    resLine.innerHTML = `<span class="text-cyber-red">ERR: Palette must be green, cyan, red, or purple</span>`;
+                }
+            } else if (cmd === 'clear') {
+                output.innerHTML = '';
+                input.value = '';
+                return;
+            } else {
+                resLine.innerHTML = `<span class="text-slate-500">Command not recognized. Type 'help' for available CLI commands.</span>`;
+            }
+
+            output.appendChild(resLine);
+            output.scrollTop = output.scrollHeight;
+            input.value = '';
+        }
+
+        function focusTerminal() {
+            setTimeout(() => {
+                const inp = document.getElementById('terminalInput');
+                if (inp) inp.focus();
+            }, 200);
+        }
+
+        /* ==========================================
+           7. FORM TRANSMISSION & DIGITAL VIP BADGE
+           ========================================== */
+        function sendEncryptedMessage(e) {
+            e.preventDefault();
+            playSound(1200, 'sine', 0.15);
+            
+            const status = document.getElementById('contactStatus');
+            status.classList.remove('hidden');
+            document.getElementById('contactForm').reset();
+
+            setTimeout(() => {
+                status.classList.add('hidden');
+            }, 5000);
+        }
+
+        function drawCyberQrCanvas() {
+            const canvas = document.getElementById('qrCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = 80;
+            canvas.height = 80;
+
+            ctx.fillStyle = '#080d1a';
+            ctx.fillRect(0, 0, 80, 80);
+
+            ctx.fillStyle = '#00f3ff';
+            for (let x = 0; x < 80; x += 8) {
+                for (let y = 0; y < 80; y += 8) {
+                    if (Math.random() > 0.45) {
+                        ctx.fillRect(x + 1, y + 1, 6, 6);
+                    }
+                }
+            }
+
+            ctx.fillStyle = '#00ff66';
+            ctx.fillRect(4, 4, 20, 20);
+            ctx.fillRect(56, 4, 20, 20);
+            ctx.fillRect(4, 56, 20, 20);
+        }
+
+        function downloadCvSim() {
+            playSound(800, 'sine', 0.1);
+            alert("01_XVIP CV Download Initialized!\nCoddycamp Student Credentials Verified.");
+        }
+
+        /* ==========================================
+           8. REAL-TIME CLOCK & FPS LOOP
+           ========================================== */
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString() + ' Local';
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) clockEl.innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+
+        /* ==========================================
+           9. INITIALIZATION ON LOAD
+           ========================================== */
+        window.onload = function() {
+            initMatrixCanvas();
+            renderSkills();
+            drawCyberQrCanvas();
+            updateClock();
+        };
+    </script>
+</body>
+</html>
